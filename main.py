@@ -17,9 +17,9 @@ def login_window():
     password_field.pack()
 
     login_button = Button(window, text="Login", command=login)
-    login_button.pack()
+    login_button.pack(pady=10)
 
-    register_button = Button(window, text="Login", command=login)
+    register_button = Button(window, text="Register", command=register)
     register_button.pack()
 
     window.mainloop()
@@ -27,6 +27,10 @@ def login_window():
 
 def login():
     print("login success")
+
+
+def register():
+    print("Continue to registration")
 
 
 login_window()
