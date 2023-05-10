@@ -117,6 +117,7 @@ def main_screen():
             print(user)
 
         conn.close()
+        check_database()
 
     check_button = Button(login_frame, text="Check Tables", command=check_tables)
     check_button.pack(pady=(0, 10))
