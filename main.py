@@ -4,13 +4,27 @@ from tkinter import ttk
 from sqlite3 import *
 
 
-def create_user_table():
+def check_database():
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+
+    tables = c.fetchall()
+
+    for table in tables:
+        print(table[0])
+
+    conn.close()
+
+
+def create_users_table():
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
 
     c.execute("""
         CREATE TABLE users (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL
             );
@@ -20,19 +34,52 @@ def create_user_table():
     conn.close()
 
 
-def login_screen():
-    login_window = Tk()
-    login_window.geometry("300x250")
-    login_window.title("Login")
+def drop_users_table():
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
 
-    user_label = Label(login_window, text="Username:")
+    c.execute("""
+            DROP TABLE users
+        """)
+
+    conn.commit()
+    conn.close()
+
+
+def create_user_table(user_name):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    query = f"CREATE TABLE {user_name} (" \
+            f"id INTEGER PRIMARY KEY AUTOINCREMENT," \
+            f"transactionSite TEXT" \
+            f"transactionType INTEGER" \
+            f"outcome INTEGER" \
+            f"cost NUMERIC" \
+            f"payout NUMERIC);" \
+
+    c.execute(query)
+
+    conn.commit()
+    conn.close()
+
+
+def main_screen():
+
+    main_window = Tk()
+    main_window.title("Login")
+
+    login_frame = Frame(main_window, padx=50, pady=50)
+    login_frame.pack(padx=10, pady=10)
+
+    user_label = Label(login_frame, text="Username:")
     user_label.pack()
-    user_field = Entry(login_window)
+    user_field = Entry(login_frame)
     user_field.pack()
-    password_label = Label(login_window, text="Password:")
+    password_label = Label(login_frame, text="Password:")
     password_label.pack()
-    password_field = Entry(login_window)
-    password_field.pack()
+    password_field = Entry(login_frame)
+    password_field.pack(pady=(0, 10))
 
     def login():
         username = user_field.get()
@@ -49,13 +96,15 @@ def login_screen():
         conn.close()
 
         if existing_user is not None:
-            print("Successful login")
+            main_window.title("Bet Tracker")
+            login_frame.destroy()
+            print("Successful Login!")
 
-    login_button = Button(login_window, text="Login", command=login)
-    login_button.pack(pady=10)
+    login_button = Button(login_frame, text="Login", command=login)
+    login_button.pack(pady=(0, 10))
 
-    register_button = Button(login_window, text="Make New Account", command=register_screen)
-    register_button.pack()
+    register_button = Button(login_frame, text="Make New Account", command=register_screen)
+    register_button.pack(pady=(0, 10))
 
     def check_tables():
         conn = sqlite3.connect("users.db")
@@ -69,10 +118,20 @@ def login_screen():
 
         conn.close()
 
-    check_button = Button(login_window, text="Check Tables", command=check_tables)
-    check_button.pack(pady=10)
+    check_button = Button(login_frame, text="Check Tables", command=check_tables)
+    check_button.pack(pady=(0, 10))
 
-    login_window.mainloop()
+    login_frame.pack(expand=True, fill='both', padx=10, pady=10)
+
+    main_frame = Frame(main_window)
+
+    # Hide main frame initially
+    main_frame.grid_remove()
+
+    # Start with the login frame
+    login_frame.grid()
+
+    main_window.mainloop()
 
 
 def register_screen():
@@ -104,10 +163,14 @@ def register_screen():
         conn.commit()
         conn.close()
 
+        create_user_table(username)
+        check_database()
+        print("Registration Successful!")
+
     register_button = Button(register_window, text="Register", command=register)
     register_button.pack(pady=10)
 
     register_window.mainloop()
 
 
-login_screen()
+main_screen()
