@@ -250,4 +250,3 @@ def add_entry():
 
 login_screen()
 
-#s
