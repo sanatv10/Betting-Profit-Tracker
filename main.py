@@ -266,12 +266,6 @@ def main_screen():
         current_amount_label = Label(label_frame, text="Amount in accounts:")
         current_amount_label.pack()
 
-        current_label = Label(label_frame, text="Current amount in play:")
-        current_label.pack()
-
-        current_to_win_label = Label(label_frame, text="Current to win:")
-        current_to_win_label.pack()
-
         profit_label = Label(label_frame, text="Total Profit/Loss:")
         profit_label.pack()
 
