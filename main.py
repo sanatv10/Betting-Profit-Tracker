@@ -158,14 +158,14 @@ def main_screen():
                 print("3")
 
         radio = IntVar()
-        button_frame = Frame(entry_frame)
-        button_frame.pack()
-        radio_button_deposit = Radiobutton(button_frame, text="Deposit", variable=radio, value=1, command=radio_select)
+        radio_button_frame = Frame(entry_frame)
+        radio_button_frame.pack()
+        radio_button_deposit = Radiobutton(radio_button_frame, text="Deposit", variable=radio, value=1, command=radio_select)
         radio_button_deposit.pack(side="left")
-        radio_button_withdrawal = Radiobutton(button_frame, text="Withdrawal", variable=radio, value=2,
+        radio_button_withdrawal = Radiobutton(radio_button_frame, text="Withdrawal", variable=radio, value=2,
                                               command=radio_select)
         radio_button_withdrawal.pack(side="left")
-        radio_button_bet = Radiobutton(button_frame, text="Bet", variable=radio, value=3, command=radio_select)
+        radio_button_bet = Radiobutton(radio_button_frame, text="Bet", variable=radio, value=3, command=radio_select)
         radio_button_bet.pack(side="left")
 
         def num_only(text):
@@ -203,14 +203,18 @@ def main_screen():
             elif transact == 3:
                 transact_type = "Bet"
             outcome_str = ""
-            if win.get() == 1:
-                outcome_str = "Yes"
-            elif win.get() == 2:
-                outcome_str = "No"
-            else:
+            if str(win_checkbutton.cget('state')) == "disabled":
                 outcome_str = ""
+            else:
+                if win.get() == 1:
+                    outcome_str = "Yes"
+                elif win.get() == 2:
+                    outcome_str = "No"
             cost = cost_field.get()
-            pay = to_win_field.get()
+            if str(to_win_field.cget('state')) == "disabled":
+                pay = 0
+            else:
+                pay = to_win_field.get()
 
             data = (transact_type, site, cost, pay, outcome_str)
             conn = sqlite3.connect("users.db")
@@ -228,6 +232,27 @@ def main_screen():
 
         submit_button = Button(entry_frame, text="Add", command=submit)
         submit_button.pack(pady=10)
+
+        button_frame = Frame(main_window)
+        button_frame.pack(side=RIGHT, padx=10)
+
+        delete_button = Button(button_frame, text="Delete Entry")
+        delete_button.pack()
+
+        label_frame = Frame(main_window)
+        label_frame.pack(side=LEFT)
+
+        current_amount_label = Label(label_frame, text="Amount in accounts:")
+        current_amount_label.pack()
+
+        current_label = Label(label_frame, text="Current amount in play:")
+        current_label.pack()
+
+        current_to_win_label = Label(label_frame, text="Current to win:")
+        current_to_win_label.pack()
+
+        profit_label = Label(label_frame, text="Total Profit/Loss:")
+        profit_label.pack()
 
     def login():
         username = user_field.get()
