@@ -115,8 +115,28 @@ def login_screen():
         # pack the treeview widget
         entry_table.pack()
 
-        create_entry_button = Button(main_window, text="Add Entry", command=add_entry)
-        create_entry_button.pack(pady=10)
+        site_label = Label(main_window, text="Site Used:")
+        site_label.pack()
+        site_field = Entry(main_window)
+        site_field.pack()
+
+        transaction_label = Label(main_window, text="Transaction Type:")
+        transaction_label.pack()
+
+        selected = StringVar(main_window)
+
+        transaction_field = OptionMenu(main_window, selected, "Select", "Deposit", "Withdraw", "Bet")
+        transaction_field.pack()
+
+        cost_label = Label(main_window, text="Amount:")
+        cost_label.pack()
+        cost_field = Entry(main_window)
+        cost_field.pack()
+
+        to_win_label = Label(main_window, text="To Win:")
+        to_win_label.pack()
+        to_win_field = Entry(main_window)
+        to_win_field.pack()
 
     def login():
         username = user_field.get()
@@ -139,7 +159,7 @@ def login_screen():
             current_user = username
             print("Successful Login!")
             main_screen()
-            
+
     login_button = Button(login_frame, text="Login", command=login)
     login_button.pack(pady=(0, 10))
 
@@ -204,48 +224,6 @@ def register_screen():
     register_button.pack(pady=10)
 
     register_window.mainloop()
-
-
-def add_entry():
-    entry_window = Tk()
-    entry_window.geometry("300x250")
-    entry_window.title("Login")
-
-    user_label = Label(entry_window, text="Create Username:")
-    user_label.pack()
-    user_field = Entry(entry_window)
-    user_field.pack()
-    password_label = Label(entry_window, text="Create Password:")
-    password_label.pack()
-    password_field = Entry(entry_window)
-    password_field.pack()
-
-    def add():
-
-        site = "Prize Picks"
-        transaction_type = 0
-        outcome = 0
-        cost = 20.00
-        payout = 100.00
-
-        conn = sqlite3.connect("users.db")
-
-        c = conn.cursor()
-
-        c.execute("""
-                INSERT INTO username (transactionSite, transactionType, outcome, cost, payout) VALUES (?,?,?,?,?);
-            """, (site, transaction_type, outcome, cost, payout))
-
-        conn.commit()
-        conn.close()
-
-        check_database()
-        print("Add Entry Successful!")
-
-    register_button = Button(entry_window, text="Register", command=add)
-    register_button.pack(pady=10)
-
-    entry_window.mainloop()
 
 
 login_screen()
