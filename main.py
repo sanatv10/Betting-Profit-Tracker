@@ -99,12 +99,12 @@ def main_screen():
 
             # Populate the Treeview with the table data
             for row in rows:
-                entry_table.insert('', 'end', values=row[1:])
+                entry_table.insert('', 'end', values=row)
 
             # Close the connection
             conn.close()
 
-        entry_table = Treeview(main_window, columns=("column1", "column2", "column3", "column4", "column5"))
+        entry_table = Treeview(main_window, columns=("column1", "column2", "column3", "column4", "column5", "column6"))
 
         # format the columns
         entry_table.column("#0", width=0, stretch=NO)
@@ -113,13 +113,15 @@ def main_screen():
         entry_table.column("column3", width=100)
         entry_table.column("column4", width=100)
         entry_table.column("column5", width=100)
+        entry_table.column("column6", width=100)
 
         # add column headings
-        entry_table.heading("column1", text="Transaction Type")
-        entry_table.heading("column2", text="Site")
-        entry_table.heading("column3", text="Amount/Wager")
-        entry_table.heading("column4", text="Payout")
-        entry_table.heading("column5", text="Win?")
+        entry_table.heading("column1", text="ID")
+        entry_table.heading("column2", text="Transaction Type")
+        entry_table.heading("column3", text="Site")
+        entry_table.heading("column4", text="Amount/Wager")
+        entry_table.heading("column5", text="Payout")
+        entry_table.heading("column6", text="Win?")
 
         # pack the treeview widget
         entry_table.pack()
@@ -236,7 +238,26 @@ def main_screen():
         button_frame = Frame(main_window)
         button_frame.pack(side=RIGHT, padx=10)
 
-        delete_button = Button(button_frame, text="Delete Entry")
+        def delete():
+            selected_row = entry_table.focus()
+
+            if selected_row:
+                data = entry_table.item(selected_row)
+                values = data['values']
+                entry_id = values[0]
+
+                conn = sqlite3.connect('users.db')
+                cursor = conn.cursor()
+                query = f"DELETE FROM {current_user} WHERE id = ?"
+
+                cursor.execute(query, (entry_id,))
+                conn.commit()
+                conn.close()
+
+            print("Row", entry_id, "deleted successfully")
+            display_table_data()
+
+        delete_button = Button(button_frame, text="Delete Entry", command=delete)
         delete_button.pack()
 
         label_frame = Frame(main_window)
