@@ -54,11 +54,11 @@ def create_user_table(user_name):
 
     query = f"CREATE TABLE {user_name} (" \
             f"id INTEGER PRIMARY KEY AUTOINCREMENT," \
-            f"transactionSite TEXT" \
-            f"transactionType INTEGER" \
-            f"outcome INTEGER" \
-            f"cost NUMERIC" \
-            f"payout NUMERIC);" \
+            f"transactionType INTEGER," \
+            f"transactionSite TEXT," \
+            f"cost NUMERIC," \
+            f"payout NUMERIC," \
+            f"outcome INTEGER);" \
 
     c.execute(query)
 
@@ -66,8 +66,7 @@ def create_user_table(user_name):
     conn.close()
 
 
-def login_screen():
-
+def main_screen():
     main_window = Tk()
     main_window.title("Login")
 
@@ -83,13 +82,29 @@ def login_screen():
     password_field = Entry(login_frame)
     password_field.pack(pady=(0, 10))
 
-    def main_screen():
+    def main_frame():
 
         current_user_label = Label(main_window, text=current_user)
         current_user_label.pack()
 
-        entry_table = Treeview(main_window)
-        entry_table["columns"] = ("column1", "column2", "column3", "column4", "column5")
+        def display_table_data():
+            # Clear existing rows
+            entry_table.delete(*entry_table.get_children())
+
+            # Fetch the rows from the table
+            conn = sqlite3.connect('users.db')
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT * FROM {table_name}")
+            rows = cursor.fetchall()
+
+            # Populate the Treeview with the table data
+            for row in rows:
+                entry_table.insert('', 'end', values=row[1:])
+
+            # Close the connection
+            conn.close()
+
+        entry_table = Treeview(main_window, columns=("column1", "column2", "column3", "column4", "column5"))
 
         # format the columns
         entry_table.column("#0", width=0, stretch=NO)
@@ -106,37 +121,113 @@ def login_screen():
         entry_table.heading("column4", text="Payout")
         entry_table.heading("column5", text="Win?")
 
-        # add data to the table
-        entry_table.insert("", END, text="Row 1", values=("Deposit", "Prize Picks", "20", "", ""))
-        entry_table.insert("", END, text="Row 1", values=("Entry", "Prize Picks", "10", "250", "Yes"))
-        entry_table.insert("", END, text="Row 1", values=("Entry", "Prize Picks", "10", "50", "No"))
-        entry_table.insert("", END, text="Row 1", values=("Withdrawal", "Prize Picks", "260", "", ""))
-
         # pack the treeview widget
         entry_table.pack()
 
-        site_label = Label(main_window, text="Site Used:")
+        # Set the table name
+        table_name = current_user
+
+        # Display the table data
+        display_table_data()
+
+        entry_frame = Frame(main_window)
+        entry_frame.pack(side=RIGHT, padx=10, pady=10)
+
+        site_label = Label(entry_frame, text="Site Used:")
         site_label.pack()
-        site_field = Entry(main_window)
+        site_field = Entry(entry_frame)
         site_field.pack()
 
-        transaction_label = Label(main_window, text="Transaction Type:")
+        transaction_label = Label(entry_frame, text="Transaction Type:")
         transaction_label.pack()
 
-        selected = StringVar(main_window)
+        def radio_select():
+            if radio.get() == 1:
+                to_win_field.config(state="disabled")
+                win_checkbutton.config(state="disabled")
+                to_win_field.delete(0, END)
+                print("1")
+            elif radio.get() == 2:
+                to_win_field.config(state="disabled")
+                win_checkbutton.config(state="disabled")
+                to_win_field.delete(0, END)
+                print("2")
+            elif radio.get() == 3:
+                to_win_field.config(state="normal")
+                win_checkbutton.config(state="normal")
+                print("3")
 
-        transaction_field = OptionMenu(main_window, selected, "Select", "Deposit", "Withdraw", "Bet")
-        transaction_field.pack()
+        radio = IntVar()
+        button_frame = Frame(entry_frame)
+        button_frame.pack()
+        radio_button_deposit = Radiobutton(button_frame, text="Deposit", variable=radio, value=1, command=radio_select)
+        radio_button_deposit.pack(side="left")
+        radio_button_withdrawal = Radiobutton(button_frame, text="Withdrawal", variable=radio, value=2,
+                                              command=radio_select)
+        radio_button_withdrawal.pack(side="left")
+        radio_button_bet = Radiobutton(button_frame, text="Bet", variable=radio, value=3, command=radio_select)
+        radio_button_bet.pack(side="left")
 
-        cost_label = Label(main_window, text="Amount:")
+        def num_only(text):
+            if text.isdigit() or text == "":
+                return True
+            else:
+                return False
+
+        no = (entry_frame.register(num_only), '%P')
+
+        cost_label = Label(entry_frame, text="Amount:")
         cost_label.pack()
-        cost_field = Entry(main_window)
+        cost_field = Entry(entry_frame, validate="key", validatecommand=no)
         cost_field.pack()
 
-        to_win_label = Label(main_window, text="To Win:")
+        to_win_label = Label(entry_frame, text="To Win:")
         to_win_label.pack()
-        to_win_field = Entry(main_window)
-        to_win_field.pack()
+        to_win_field = Entry(entry_frame, validate="key", validatecommand=no)
+        to_win_field.pack(pady=(0, 10))
+
+        win = IntVar()
+
+        win_checkbutton = Checkbutton(entry_frame, text="Winning Slip?", variable=win, onvalue=1, offvalue=2)
+        win_checkbutton.pack()
+
+        def submit():
+
+            transact_type = ""
+            site = site_field.get()
+            transact = radio.get()
+            if transact == 1:
+                transact_type = "Deposit"
+            elif transact == 2:
+                transact_type = "Withdrawal"
+            elif transact == 3:
+                transact_type = "Bet"
+            outcome_str = ""
+            if win.get() == 1:
+                outcome_str = "Yes"
+            elif win.get() == 2:
+                outcome_str = "No"
+            else:
+                outcome_str = ""
+            cost = cost_field.get()
+            pay = to_win_field.get()
+
+            data = (transact_type, site, cost, pay, outcome_str)
+            conn = sqlite3.connect("users.db")
+            c = conn.cursor()
+
+            query = f"INSERT INTO {current_user} (transactionType, transactionSite, cost, payout, outcome)" \
+                    f"VALUES (?,?,?,?,?)" \
+
+            c.execute(query, data)
+
+            conn.commit()
+            conn.close()
+
+            display_table_data()
+
+        submit_button = Button(entry_frame, text="Add", command=submit)
+        submit_button.pack(pady=10)
 
     def login():
         username = user_field.get()
@@ -158,7 +249,7 @@ def login_screen():
             global current_user
             current_user = username
             print("Successful Login!")
-            main_screen()
+            main_frame()
 
     login_button = Button(login_frame, text="Login", command=login)
     login_button.pack(pady=(0, 10))
@@ -226,5 +317,5 @@ def register_screen():
     register_window.mainloop()
 
 
-login_screen()
+main_screen()
 
