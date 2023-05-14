@@ -65,6 +65,8 @@ def create_user_table(user_name):
 
     conn.commit()
     conn.close()
+
+
 def main_screen():
     main_window = Tk()
     main_window.title("Login")
@@ -230,6 +232,8 @@ def main_screen():
             conn.close()
 
             display_table_data()
+            current_amount_field.config(text=str(total_amount()))
+            profit_label_field.config(text=str(profit_loss()))
 
         submit_button = Button(entry_frame, text="Add", command=submit)
         submit_button.pack(pady=10)
@@ -253,7 +257,7 @@ def main_screen():
             #print(value2)
 
             if value1[0] is None:
-                return (value2[0])
+                return value2[0]
             elif value2[0] is None:
                 return value1[0]
             else:
@@ -275,7 +279,7 @@ def main_screen():
             c.close()
 
             if value2[0] is None:
-                return (-1 * value1[0])
+                return -1 * value1[0]
             elif value1[0] is None:
                 return value2[0]
             else:
