@@ -252,9 +252,14 @@ def main_screen():
             c.close()
             #print(value2)
 
-            value3 = value1[0]-value2[0]
-            #print (value3)
-            return value3
+            if value1[0] is None:
+                return (value2[0])
+            elif value2[0] is None:
+                return value1[0]
+            else:
+                value3 = value1[0]-value2[0]
+                #print (value3)
+                return value3
 
         def profit_loss():
             conn = sqlite3.connect("users.db")
@@ -268,9 +273,15 @@ def main_screen():
             value2 = c.fetchone()
             print(value2)
             c.close()
-            value3 = value2[0] - value1[0]
-            print(value3)
-            return value3
+
+            if value2[0] is None:
+                return (-1 * value1[0])
+            elif value1[0] is None:
+                return value2[0]
+            else:
+                value3 = value2[0] - value1[0]
+                print(value3)
+                return value3
 
         def delete():
             selected_row = entry_table.focus()
@@ -290,6 +301,8 @@ def main_screen():
 
             print("Row", entry_id, "deleted successfully")
             display_table_data()
+            current_amount_field.config(text=str(total_amount()))
+            profit_label_field.config(text=str(profit_loss()))
 
         delete_button = Button(button_frame, text="Delete Entry", command=delete)
         delete_button.pack()
@@ -299,12 +312,16 @@ def main_screen():
 
         current_amount_label = Label(label_frame, text="Amount in accounts:")
         current_amount_label.pack()
-        #current_amount_field = partial(total_amount())
-        #current_amount_field.pack()
+        current_amount_field = Label(label_frame, text=str(total_amount()))
+        current_amount_field.pack()
 
         profit_label = Label(label_frame, text="Total Profit/Loss:")
         profit_label.pack()
-        profit_label_field =partial(profit_loss())
+        profit_label_field = Label(label_frame, text=str(profit_loss()))
+        profit_label_field.pack()
+
+        print(profit_loss())
+        print(total_amount())
 
 
     def login():
