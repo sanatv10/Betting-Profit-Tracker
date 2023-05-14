@@ -262,14 +262,14 @@ def main_screen():
 
             c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Deposit'")
             value1 = c.fetchone()
-            #print(value1)
+            print(value1)
 
             c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Withdrawal'")
             value2 = c.fetchone()
-            #print(value2)
+            print(value2)
             c.close()
             value3 = value2[0] - value1[0]
-            #print(value3)
+            print(value3)
             return value3
 
         def delete():
@@ -299,12 +299,12 @@ def main_screen():
 
         current_amount_label = Label(label_frame, text="Amount in accounts:")
         current_amount_label.pack()
-        current_amount_field = partial(total_amount())
-        current_amount_field.pack()
+        #current_amount_field = partial(total_amount())
+        #current_amount_field.pack()
 
         profit_label = Label(label_frame, text="Total Profit/Loss:")
         profit_label.pack()
-        profit_label_field =
+        profit_label_field =partial(profit_loss())
 
 
     def login():
