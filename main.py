@@ -250,20 +250,29 @@ def main_screen():
             value1 = c.fetchone()
             #print(value1)
 
-            query2 = f"SELECT sum(cost) from {current_user} "
-            c.execute(query2)
+            c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Deposit'")
             value2 = c.fetchone()
+
+            c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Withdrawal'")
+            value3 = c.fetchone()
+
+            c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Bet'")
+            value4 = c.fetchone()
+
             c.close()
-            #print(value2)
 
             if value1[0] is None:
-                return value2[0]
+                value1[0] = 0
             elif value2[0] is None:
-                return value1[0]
-            else:
-                value3 = value1[0]-value2[0]
-                #print (value3)
-                return value3
+                value2[0] = 0
+            elif value3[0] is None:
+                value3[0] = 0
+            elif value4[0] is None:
+                value4[0] = 0
+
+            value5 = value1[0]+value2[0]-value3[0]-value4[0]
+            #print (value3)
+            return value5
 
         def profit_loss():
             conn = sqlite3.connect("users.db")
