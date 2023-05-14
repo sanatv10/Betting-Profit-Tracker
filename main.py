@@ -2,6 +2,7 @@ import sqlite3
 from tkinter import *
 from tkinter.ttk import *
 from sqlite3 import *
+from functools import partial
 
 current_user = ""
 
@@ -64,8 +65,6 @@ def create_user_table(user_name):
 
     conn.commit()
     conn.close()
-
-
 def main_screen():
     main_window = Tk()
     main_window.title("Login")
@@ -238,6 +237,41 @@ def main_screen():
         button_frame = Frame(main_window)
         button_frame.pack(side=RIGHT, padx=10)
 
+        def total_amount():
+            Win_id = "Yes"
+            conn = sqlite3.connect("users.db")
+            c = conn.cursor()
+
+            c.execute(f"select sum(payout) from {current_user} WHERE outcome = 'Yes'")
+            value1 = c.fetchone()
+            #print(value1)
+
+            query2 = f"SELECT sum(cost) from {current_user} "
+            c.execute(query2)
+            value2 = c.fetchone()
+            c.close()
+            #print(value2)
+
+            value3 = value1[0]-value2[0]
+            #print (value3)
+            return value3
+
+        def profit_loss():
+            conn = sqlite3.connect("users.db")
+            c = conn.cursor()
+
+            c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Deposit'")
+            value1 = c.fetchone()
+            #print(value1)
+
+            c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Withdrawal'")
+            value2 = c.fetchone()
+            #print(value2)
+            c.close()
+            value3 = value2[0] - value1[0]
+            #print(value3)
+            return value3
+
         def delete():
             selected_row = entry_table.focus()
 
@@ -265,9 +299,13 @@ def main_screen():
 
         current_amount_label = Label(label_frame, text="Amount in accounts:")
         current_amount_label.pack()
+        current_amount_field = partial(total_amount())
+        current_amount_field.pack()
 
         profit_label = Label(label_frame, text="Total Profit/Loss:")
         profit_label.pack()
+        profit_label_field =
+
 
     def login():
         username = user_field.get()
@@ -358,4 +396,10 @@ def register_screen():
 
 
 main_screen()
+
+
+
+
+
+
 
