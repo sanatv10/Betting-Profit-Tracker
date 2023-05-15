@@ -259,10 +259,6 @@ def main_screen():
 
             c.close()
 
-            print(value1)
-            print(value2)
-            print(value3)
-            print(value4)
             if value1 is None:
                 value1 = 0
             if value2 is None:
