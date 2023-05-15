@@ -2,7 +2,6 @@ import sqlite3
 from tkinter import *
 from tkinter.ttk import *
 from sqlite3 import *
-from functools import partial
 
 current_user = ""
 
@@ -163,7 +162,8 @@ def main_screen():
         radio = IntVar()
         radio_button_frame = Frame(entry_frame)
         radio_button_frame.pack()
-        radio_button_deposit = Radiobutton(radio_button_frame, text="Deposit", variable=radio, value=1, command=radio_select)
+        radio_button_deposit = Radiobutton(radio_button_frame, text="Deposit", variable=radio, value=1,
+                                           command=radio_select)
         radio_button_deposit.pack(side="left")
         radio_button_withdrawal = Radiobutton(radio_button_frame, text="Withdrawal", variable=radio, value=2,
                                               command=radio_select)
@@ -242,36 +242,37 @@ def main_screen():
         button_frame.pack(side=RIGHT, padx=10)
 
         def total_amount():
-            Win_id = "Yes"
             conn = sqlite3.connect("users.db")
             c = conn.cursor()
 
             c.execute(f"select sum(payout) from {current_user} WHERE outcome = 'Yes'")
-            value1 = c.fetchone()
-            #print(value1)
+            value1 = c.fetchone()[0]
 
             c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Deposit'")
-            value2 = c.fetchone()
+            value2 = c.fetchone()[0]
 
             c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Withdrawal'")
-            value3 = c.fetchone()
+            value3 = c.fetchone()[0]
 
             c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Bet'")
-            value4 = c.fetchone()
+            value4 = c.fetchone()[0]
 
             c.close()
 
-            if value1[0] is None:
-                value1[0] = 0
-            elif value2[0] is None:
-                value2[0] = 0
-            elif value3[0] is None:
-                value3[0] = 0
-            elif value4[0] is None:
-                value4[0] = 0
+            print(value1)
+            print(value2)
+            print(value3)
+            print(value4)
+            if value1 is None:
+                value1 = 0
+            if value2 is None:
+                value2 = 0
+            if value3 is None:
+                value3 = 0
+            if value4 is None:
+                value4 = 0
 
-            value5 = value1[0]+value2[0]-value3[0]-value4[0]
-            #print (value3)
+            value5 = value1+value2-value3-value4
             return value5
 
         def profit_loss():
@@ -279,20 +280,26 @@ def main_screen():
             c = conn.cursor()
 
             c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Deposit'")
-            value1 = c.fetchone()
+            value1 = c.fetchone()[0]
             print(value1)
 
             c.execute(f"SELECT sum(cost) from {current_user} WHERE transactionType = 'Withdrawal'")
-            value2 = c.fetchone()
+            value2 = c.fetchone()[0]
             print(value2)
             c.close()
 
-            if value2[0] is None:
-                return -1 * value1[0]
-            elif value1[0] is None:
-                return value2[0]
+            if value1 is None:
+                if value2 is None:
+                    return 0
+                else:
+                    return value2
+            elif value2 is None:
+                if value1 is None:
+                    return 0
+                else:
+                    return -1 * value1
             else:
-                value3 = value2[0] - value1[0]
+                value3 = value2 - value1
                 print(value3)
                 return value3
 
@@ -312,7 +319,8 @@ def main_screen():
                 conn.commit()
                 conn.close()
 
-            print("Row", entry_id, "deleted successfully")
+                print("Row", entry_id, "deleted successfully")
+
             display_table_data()
             current_amount_field.config(text=str(total_amount()))
             profit_label_field.config(text=str(profit_loss()))
@@ -335,7 +343,6 @@ def main_screen():
 
         print(profit_loss())
         print(total_amount())
-
 
     def login():
         username = user_field.get()
@@ -426,10 +433,3 @@ def register_screen():
 
 
 main_screen()
-
-
-
-
-
-
-
