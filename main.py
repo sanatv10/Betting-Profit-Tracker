@@ -1,23 +1,24 @@
 import sqlite3
 from tkinter import *
+from tkinter import messagebox
 from tkinter.ttk import *
 from sqlite3 import *
 
 current_user = ""
 
 
-def check_database():
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-
-    c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-
-    tables = c.fetchall()
-
-    for table in tables:
-        print(table[0])
-
-    conn.close()
+#def check_database():
+#    conn = sqlite3.connect("users.db")
+#    c = conn.cursor()
+#
+#    c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+#
+#    tables = c.fetchall()
+#
+#    for table in tables:
+#        print(table[0])
+#
+#    conn.close()
 
 
 def create_users_table():
@@ -359,8 +360,10 @@ def main_screen():
             login_frame.destroy()
             global current_user
             current_user = username
-            print("Successful Login!")
+            print("Login Successful!")
             main_frame()
+        else:
+            messagebox.showerror("Error", "Wrong credentials! Try again!")
 
     login_button = Button(login_frame, text="Login", command=login)
     login_button.pack(pady=(0, 10))
@@ -368,21 +371,21 @@ def main_screen():
     register_button = Button(login_frame, text="Make New Account", command=register_screen)
     register_button.pack(pady=(0, 10))
 
-    def check_tables():
-        conn = sqlite3.connect("users.db")
-        c = conn.cursor()
+#    def check_tables():
+#        conn = sqlite3.connect("users.db")
+#        c = conn.cursor()
+#
+#        c.execute("SELECT * FROM users")
+#        users = c.fetchall()
+#
+#        for user in users:
+#            print(user)
+#
+#        conn.close()
+#        check_database()
 
-        c.execute("SELECT * FROM users")
-        users = c.fetchall()
-
-        for user in users:
-            print(user)
-
-        conn.close()
-        check_database()
-
-    check_button = Button(login_frame, text="Check Tables", command=check_tables)
-    check_button.pack(pady=(0, 10))
+#    check_button = Button(login_frame, text="Check Tables", command=check_tables)
+#    check_button.pack(pady=(0, 10))
 
     login_frame.pack(expand=True, fill='both', padx=50, pady=50)
 
@@ -419,8 +422,8 @@ def register_screen():
         conn.close()
 
         create_user_table(username)
-        check_database()
-        print("Registration Successful!")
+#        check_database()
+        messagebox.showinfo("Registration Successful!", "Registration Successful!")
 
     register_button = Button(register_window, text="Register", command=register)
     register_button.pack(pady=10)
