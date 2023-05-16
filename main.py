@@ -6,7 +6,7 @@ from sqlite3 import *
 
 current_user = ""
 
-
+# Check database function used for debugging
 #def check_database():
 #    conn = sqlite3.connect("users.db")
 #    c = conn.cursor()
@@ -63,7 +63,7 @@ def main_screen():
     user_field.pack()
     password_label = Label(login_frame, text="Password:")
     password_label.pack()
-    password_field = Entry(login_frame)
+    password_field = Entry(login_frame, show="*")
     password_field.pack(pady=(0, 10))
 
     def main_frame():
@@ -72,25 +72,20 @@ def main_screen():
         current_user_label.pack()
 
         def display_table_data():
-            # Clear existing rows
             entry_table.delete(*entry_table.get_children())
 
-            # Fetch the rows from the table
             conn = sqlite3.connect('users.db')
             cursor = conn.cursor()
             cursor.execute(f"SELECT * FROM {table_name}")
             rows = cursor.fetchall()
 
-            # Populate the Treeview with the table data
             for row in rows:
                 entry_table.insert('', 'end', values=row)
 
-            # Close the connection
             conn.close()
 
         entry_table = Treeview(main_window, columns=("column1", "column2", "column3", "column4", "column5", "column6"))
 
-        # format the columns
         entry_table.column("#0", width=0, stretch=NO)
         entry_table.column("column1", width=100)
         entry_table.column("column2", width=100)
@@ -99,7 +94,6 @@ def main_screen():
         entry_table.column("column5", width=100)
         entry_table.column("column6", width=100)
 
-        # add column headings
         entry_table.heading("column1", text="ID")
         entry_table.heading("column2", text="Transaction Type")
         entry_table.heading("column3", text="Site")
@@ -107,13 +101,10 @@ def main_screen():
         entry_table.heading("column5", text="Payout")
         entry_table.heading("column6", text="Win?")
 
-        # pack the treeview widget
         entry_table.pack()
 
-        # Set the table name
         table_name = current_user
 
-        # Display the table data
         display_table_data()
 
         entry_frame = Frame(main_window)
@@ -354,6 +345,7 @@ def main_screen():
     register_button = Button(login_frame, text="Make New Account", command=register_screen)
     register_button.pack(pady=(0, 10))
 
+# Check tables function for debugging
 #    def check_tables():
 #        conn = sqlite3.connect("users.db")
 #        c = conn.cursor()
